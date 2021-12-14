@@ -20,11 +20,13 @@ function App() {
       </header>
       <div className="App-content">
         <div className="App-content-left">
+          INPUT DATA<br/>
           Historical dates to inspect<br/>
           From:<br/>
           To:
         </div>
         <div className="App-content-right">
+          ANALYZED DATA<br/>
           Longest bearish trend in days:<br/>
           From:<br/>
           To:<br/>
