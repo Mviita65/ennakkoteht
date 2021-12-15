@@ -1,5 +1,7 @@
 import logo from './bc-logo.svg';
 import './App.css';
+import InputData from './components/InputData'
+import AnalyzedData from './components/AnalyzedData'
 
 function App() {
   return (
@@ -9,30 +11,13 @@ function App() {
         <p>
           Bitcoin Market Value Analyzer
         </p>
-        {/* <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a> */}
       </header>
       <div className="App-content">
         <div className="App-content-left">
-          INPUT DATA<br/>
-          Historical dates to inspect<br/>
-          From:<br/>
-          To:
+          <InputData/>
         </div>
         <div className="App-content-right">
-          ANALYZED DATA<br/>
-          Longest bearish trend in days:<br/>
-          From:<br/>
-          To:<br/>
-          Highest trading volume:<br/>
-          Best day for buying:<br/>
-          Best day for selling:
+          <AnalyzedData/>
         </div>
       </div>
       <footer className="App-footer">

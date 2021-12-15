@@ -35,22 +35,21 @@
 }
 
 .App-content-left {
+  padding-right: 1vw;
   padding-left: 10vw;
   min-width: 35vw;
 }
 
 .App-content-right {
+  padding-left: 1vw;
   padding-right: 5vw;
   min-width: 40vw;
 }
+
 .App-footer {
   min-height: 10vh;
   font-size: calc(10px + 1vmin);
 }
-
-/* .App-link {
-  color: #61dafb;
-} */
 
 @keyframes App-logo-spin {
   from {
