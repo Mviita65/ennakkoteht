@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
+import { toTimestamp } from './helpers';
 
 const InputData = () => {
 
@@ -7,6 +8,17 @@ const InputData = () => {
     const minDate = "2010-07-18" // bitcoin euro history according to currencies.zone
     const maxDate = new Date().toISOString().slice(0,10) // today yyyy-mm-dd
     const [info, setInfo] = useState("Waiting for the dates")
+
+    const datesPassed = () => {
+        if (info === "Dates passed!") {
+            console.log(newFrom)
+            console.log(toTimestamp(newFrom,'start'))
+            console.log(newTo)
+            console.log(toTimestamp(newTo,'end'))
+        } else {
+            console.log("must wait for the correct dates")
+        }
+    }
 
     const inputErrorFrom = () => {
         setInfo("fromDate must be earlier than toDate")
@@ -28,21 +40,25 @@ const InputData = () => {
         setNewFrom(e.target.value)
     }
 
+    useEffect(datesPassed, [info,newFrom,newTo]);
+
     return (
         <>
           INPUT DATA<br/>
           Historical dates to inspect<br/>
           From: <input type="date" max={maxDate} min={minDate}
            onChange={e => {(newTo === "")
-                ? setNewFrom(e.target.value)
-                : (e.target.value > newTo) 
-                    ? inputErrorFrom()
-                    : inputNewFromOk(e) } } 
+                ? setNewFrom(e.target.value) // newTo date is not yet given
+                : (e.target.value > newTo)   
+                    ? inputErrorFrom()       // if newFrom date is later than given newTo
+                    : inputNewFromOk(e) } }  // dates are in correct order
            value={newFrom} required /><br/>
           To: <input type="date" max={maxDate} min={minDate} 
-            onChange={e => {(e.target.value < newFrom) 
-                ? inputErrorTo()
-                : inputNewToOk(e)} }
+            onChange={e => {(newFrom === "")
+                ? setNewTo(e.target.value)  // newFrom date is not yet given
+                : (e.target.value < newFrom) 
+                    ? inputErrorTo()        // if newTo date is earlier than given newFrom
+                    : inputNewToOk(e)} }    // dates are in correct order
             value={newTo} required /><br/>
           <p>Info: <br/>{info}</p>
         </>
