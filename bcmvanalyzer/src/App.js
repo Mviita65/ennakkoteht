@@ -1,9 +1,14 @@
 import logo from './bc-logo.svg';
 import './App.css';
+import React, { useState } from 'react'
 import InputData from './components/InputData'
 import AnalyzedData from './components/AnalyzedData'
 
 function App() {
+
+  const [newFrom, setNewFrom] = useState("")
+  const [newTo, setNewTo] = useState("")
+
   return (
     <div className="App">
       <header className="App-header">
@@ -14,10 +19,10 @@ function App() {
       </header>
       <div className="App-content">
         <div className="App-content-left">
-          <InputData/>
+          <InputData newFrom={newFrom} setNewFrom={setNewFrom} newTo={newTo} setNewTo={setNewTo}/>
         </div>
         <div className="App-content-right">
-          <AnalyzedData/>
+          <AnalyzedData newFrom={newFrom} newTo={newTo}/>
         </div>
       </div>
       <footer className="App-footer">

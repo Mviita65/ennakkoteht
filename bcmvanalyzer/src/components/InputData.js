@@ -1,21 +1,15 @@
 import React, { useState,useEffect } from 'react'
-import { toTimestamp } from './helpers';
 
-const InputData = () => {
+const InputData = ({newFrom,setNewFrom,newTo,setNewTo}) => {
 
-    const [newFrom, setNewFrom] = useState("");
-    const [newTo, setNewTo] = useState("");
-    const minDate = "2010-07-18" // bitcoin euro history according to currencies.zone
+    // const [newFrom, setNewFrom] = useState("")
+    // const [newTo, setNewTo] = useState("")
+    const minDate = "2013-04-28" // first date for bitcoin eur in getcoin
     const maxDate = new Date().toISOString().slice(0,10) // today yyyy-mm-dd
     const [info, setInfo] = useState("Waiting for the dates")
 
     const datesPassed = () => {
-        if (info === "Dates passed!") {
-            console.log(newFrom)
-            console.log(toTimestamp(newFrom,'start'))
-            console.log(newTo)
-            console.log(toTimestamp(newTo,'end'))
-        } else {
+        if (info !== "Dates passed!") {        
             console.log("must wait for the correct dates")
         }
     }
@@ -40,7 +34,7 @@ const InputData = () => {
         setNewFrom(e.target.value)
     }
 
-    useEffect(datesPassed, [info,newFrom,newTo]);
+    useEffect(datesPassed, [info,newFrom,newTo])
 
     return (
         <>
