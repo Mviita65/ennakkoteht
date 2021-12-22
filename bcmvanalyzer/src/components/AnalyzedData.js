@@ -5,12 +5,13 @@ import axios from 'axios';
 
 const AnalyzedData = ({newFrom,newTo}) => {
   const [data,setData] = useState(["Waiting for the data..."])
-  const [downwardDays, setDownwardDays] = useState("")
-  const [topCourse, setTopCourse] = useState("")
-  const [downStart, setDownStart] = useState("")
-  const [downEnd, setDownEnd] = useState("")
-  const [sellDay,setSellDay] = useState("")
-  const [buyDay,setBuyDay] = useState("")
+  
+  let downwardDays = ""
+  let topCourse = ""
+  let downStart = ""
+  let downEnd = ""
+  let sellDay = ""
+  let buyDay = ""
 
   let today = ""
   let start = ""
@@ -23,10 +24,13 @@ const AnalyzedData = ({newFrom,newTo}) => {
     console.log(newFrom,' 00:00:00 GMT+0000 =', start)
     console.log(newTo,' 01:00:00 GMT+0000 =', end)
     console.log(today)
-    dataAnalyzer(start,end,today,data,setDownwardDays,
-      setTopCourse,setDownStart,
-      setDownEnd,setSellDay,setBuyDay
-    )
+    let feedback = dataAnalyzer(start,end,today,data)
+    downwardDays = feedback[0]
+    topCourse = feedback[1]
+    downStart = feedback[2]
+    downEnd = feedback[3]
+    sellDay = feedback[4]
+    buyDay = feedback[5]
   } 
    
   useEffect(()=>{
