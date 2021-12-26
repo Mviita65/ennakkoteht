@@ -16,31 +16,50 @@ const dataAnalyzer = (start,end,today,data) => {
     // 0000000001 = 1.1.1970 00:00:01
     // 1577836800 = 1.1.2020 00:00:00
     // 1577836800 + 86400 = 1577923200 = 2.1.2020 00:00:00
+    const getDateFromTimestamp = (stamp) => {
+       let datestring = new Date(stamp).toLocaleString("fi-FI")
+       return datestring
+    }
+
+    const findLowestCourse = () => {
+        let min = findTopCourse()
+        let mindate = ""
+        data.forEach((item => {
+            if (item[1] < min){
+                min = item[1]
+                mindate = getDateFromTimestamp(item[0])
+                console.log("Min:", mindate, item[0], item[1])
+            }
+        }))
+        return mindate
+    }
 
     const findTopCourse = () => {
         let top = 0
+        let topdate = ""
         data.forEach((item => {
-            // if (item[0]%86400===0){ 
-                if (item[1] > top){
-                    top = item[1]
-                }
-            // }
+            if (item[1] > top){
+                top = item[1]
+                topdate = getDateFromTimestamp(item[0])
+                console.log(topdate, item[0])
+            }
         }))
+        analyzedData[4] = topdate
         return top
     }
 
     if (start > (today-86400)) {
         analyzedData[0] = "NOT older than one day"
-        analyzedData[1] = findTopCourse()
     } else {
         if (start > (today-90*86400)){
             analyzedData[0] = "NOT older than 90 days"
-            analyzedData[1] = findTopCourse()
+
         } else {
             analyzedData[0] = "Older than 90 days"
-            analyzedData[1] = findTopCourse()
         }
     }
+    analyzedData[1] = findTopCourse()
+    analyzedData[5] = findLowestCourse()
     return analyzedData
 }
 
