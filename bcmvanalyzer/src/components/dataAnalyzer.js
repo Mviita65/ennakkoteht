@@ -87,7 +87,7 @@ const dataAnalyzer = (start,end,today,data) => {
         selectValues()
         
     } else {
-        if ((start + 86400) > (today-90*86400)){
+        if ((start) > (today-90*86400)){
             analyzedData[0] = "NOT older than 90 days"
             selectValues()
 
