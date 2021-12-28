@@ -19,6 +19,7 @@ const AnalyzedData = ({newFrom,newTo}) => {
 
   if (newFrom !== "" && newTo !=="") {
     today = Date.parse(new Date())/1000
+    console.log("Today:",today)
     start = toTimestamp(newFrom,'start')
     end = toTimestamp(newTo,'end')
     console.log(newFrom,' 00:00:00 GMT+0000 =', start)
@@ -36,11 +37,15 @@ const AnalyzedData = ({newFrom,newTo}) => {
   useEffect(()=>{
     async function fetchData(){
       if (start !== "" && end !== ""){
-        let result = await axios(
-          'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from='+start+'&to='+end
-        )
-        console.log('Result: ',result)
-        setData(result.data.prices)
+        try {
+          let result = await axios(
+            'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from='+start+'&to='+end
+          )
+          console.log('Result: ',result)
+          setData(result.data.prices)
+        } catch (exception) {
+          console.log(exception)
+        }
       } else {
         console.log("Dates not yet given!")
       }

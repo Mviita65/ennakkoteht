@@ -16,6 +16,7 @@ const dataAnalyzer = (start,end,today,data) => {
     // 0000000001 = 1.1.1970 00:00:01
     // 1577836800 = 1.1.2020 00:00:00
     // 1577836800 + 86400 = 1577923200 = 2.1.2020 00:00:00
+
     const getDateFromTimestamp = (stamp) => {
        let datestring = new Date(stamp).toLocaleString("fi-FI")
        return datestring
@@ -28,7 +29,7 @@ const dataAnalyzer = (start,end,today,data) => {
             if (item[1] < min){
                 min = item[1]
                 mindate = getDateFromTimestamp(item[0])
-                console.log("Min:", mindate, item[0], item[1])
+                console.log("NewMin:", mindate, item[0], item[1])
             }
         }))
         return mindate
@@ -41,18 +42,54 @@ const dataAnalyzer = (start,end,today,data) => {
             if (item[1] > top){
                 top = item[1]
                 topdate = getDateFromTimestamp(item[0])
-                console.log(topdate, item[0])
+                console.log("NewMax:",topdate, item[0], item[1])
             }
         }))
         analyzedData[4] = topdate
         return top
     }
 
-    if (start > (today-86400)) {
+    const selectValues = () => {
+        let selectedValues = []
+        let day = ""
+        data.forEach((item => {
+            if (getDateFromTimestamp(item[0]).slice(0, 4) !== day){
+                selectedValues.push(item)
+                day = getDateFromTimestamp(item[0]).slice(0, 4)
+            }
+        }))
+        console.log("Selected:",selectedValues)
+    }
+    
+    const countDownwardDays = (dataArray) => {
+        // downwardDays = feedback[0]
+        // topCourse = feedback[1]
+        // downStart = feedback[2]
+        // downEnd = feedback[3]
+        // sellDay = feedback[4]
+        // buyDay = feedback[5]
+        let days = 0
+        let start = ""
+        let stop = ""
+        let verify = dataArray[0[1]]
+        dataArray.forEach((item => {
+
+            if (item[1] < verify) {
+                verify = item[1]
+                days++
+                
+            }
+        }))
+    }
+
+    if ((start + 86400)  > (today-86400)) {
         analyzedData[0] = "NOT older than one day"
+        selectValues()
+        
     } else {
-        if (start > (today-90*86400)){
+        if ((start + 86400) > (today-90*86400)){
             analyzedData[0] = "NOT older than 90 days"
+            selectValues()
 
         } else {
             analyzedData[0] = "Older than 90 days"
