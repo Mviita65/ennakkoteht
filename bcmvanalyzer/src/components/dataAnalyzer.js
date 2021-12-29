@@ -1,4 +1,6 @@
 const dataAnalyzer = (start,end,today,data) => {
+    let sendData = []
+    let returnValues = []
     let analyzedData = ["","","","","",""]
 
     // Coingecko API:
@@ -18,14 +20,29 @@ const dataAnalyzer = (start,end,today,data) => {
     // 1577836800 + 86400 = 1577923200 = 2.1.2020 00:00:00
 
     const getDateFromTimestamp = (stamp) => {
-       let datestring = new Date(stamp).toLocaleString("fi-FI")
+       let datestring = new Date(stamp).toLocaleDateString("fi-FI")
        return datestring
     }
 
-    const findLowestCourse = () => {
-        let min = findTopCourse()
+    const findTopCourse = (values) => { 
+        let top = 0
+        let topdate = ""
+        values.forEach((item => {
+            if (item[1] > top){
+                top = item[1]
+                topdate = getDateFromTimestamp(item[0])
+                // console.log("NewMax:",topdate, item[0], item[1])
+            }
+        }))
+        analyzedData[4] = topdate
+        let courseAndDate = String(top).concat(" €, ",topdate)
+        return courseAndDate
+    }
+
+    const findLowestCourse = (values) => {
+        let min = 1000000000
         let mindate = ""
-        data.forEach((item => {
+        values.forEach((item => {
             if (item[1] < min){
                 min = item[1]
                 mindate = getDateFromTimestamp(item[0])
@@ -35,21 +52,7 @@ const dataAnalyzer = (start,end,today,data) => {
         return mindate
     }
 
-    const findTopCourse = () => {
-        let top = 0
-        let topdate = ""
-        data.forEach((item => {
-            if (item[1] > top){
-                top = item[1]
-                topdate = getDateFromTimestamp(item[0])
-                console.log("NewMax:",topdate, item[0], item[1])
-            }
-        }))
-        analyzedData[4] = topdate
-        return top
-    }
-
-    const selectValues = () => {
+    const selectValues = () => {    // to get only the day's first value
         let selectedValues = []
         let day = ""
         data.forEach((item => {
@@ -59,44 +62,49 @@ const dataAnalyzer = (start,end,today,data) => {
             }
         }))
         console.log("Selected:",selectedValues)
+        return selectedValues
     }
     
-    const countDownwardDays = (dataArray) => {
-        // downwardDays = feedback[0]
-        // topCourse = feedback[1]
-        // downStart = feedback[2]
-        // downEnd = feedback[3]
-        // sellDay = feedback[4]
-        // buyDay = feedback[5]
-        let days = 0
-        let start = ""
-        let stop = ""
-        let verify = dataArray[0[1]]
-        dataArray.forEach((item => {
-
-            if (item[1] < verify) {
-                verify = item[1]
-                days++
-                
+    const countDownwardDays = (values) => {
+        let counter = 0
+        let maxCount = 0
+        let memoryDate = ""
+        let beginDay = ""
+        let endDay = ""
+        let checkValue = values[0][1]
+        let downwardData = ["Begin","End",0]
+        console.log("StartValue:",checkValue)
+        values.forEach((item => {
+            if (item[1] < checkValue){  // day's course lower than check
+                counter++
+                console.log(checkValue, counter)
+                if (counter === 1){
+                    memoryDate = item[0]
+                }
+                if (counter > maxCount){ // new longest downward trend in days
+                    maxCount = counter
+                    endDay = getDateFromTimestamp(item[0])
+                    beginDay = getDateFromTimestamp(memoryDate)
+                }
+            } else {
+                counter = 0
             }
+            checkValue = item[1]
         }))
+        console.log("Downward days:", maxCount)
+        downwardData[0] = beginDay
+        downwardData[1] = endDay
+        downwardData[2] = maxCount
+        return downwardData
     }
 
-    if ((start + 86400)  > (today-86400)) {
-        analyzedData[0] = "NOT older than one day"
-        selectValues()
-        
-    } else {
-        if ((start) > (today-90*86400)){
-            analyzedData[0] = "NOT older than 90 days"
-            selectValues()
-
-        } else {
-            analyzedData[0] = "Older than 90 days"
-        }
-    }
-    analyzedData[1] = findTopCourse()
-    analyzedData[5] = findLowestCourse()
+    sendData = selectValues()
+    analyzedData[1] = findTopCourse(sendData)
+    analyzedData[5] = findLowestCourse(sendData)
+    returnValues = countDownwardDays(sendData)
+    analyzedData[2] = returnValues[0]
+    analyzedData[3] = returnValues[1]
+    analyzedData[0] = returnValues[2]
     return analyzedData
 }
 
