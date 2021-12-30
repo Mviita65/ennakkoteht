@@ -8,7 +8,7 @@ const InputData = ({newFrom,setNewFrom,newTo,setNewTo}) => {
 
     const datesPassed = () => {
         if (info !== "Dates passed!") {        
-            console.log("must wait for the correct dates")
+            console.log("Must wait for the correct dates")
         }
     }
 

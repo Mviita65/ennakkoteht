@@ -56,7 +56,7 @@ const dataAnalyzer = (start,end,data) => {
             }
             day = getDateFromTimestamp(item[0]).slice(0, 10)
         }))
-        console.log("Selected:",selectedValues)
+        // console.log("Selected:",selectedValues)
         return selectedValues
     }
     
@@ -93,12 +93,12 @@ const dataAnalyzer = (start,end,data) => {
             }
             checkValue = item[1]
         }))
-        console.log("Downward days:", maxCount)
+        // console.log("Downward days:", maxCount)
         downwardData[0] = beginDay
         downwardData[1] = endDay
         downwardData[2] = maxCount
-        console.log("Start:",getDateFromTimestamp(fromD),beginDay,
-            "End:",getDateFromTimestamp(toD),endDay)
+        // console.log("Start:",getDateFromTimestamp(fromD),beginDay,
+        //    "End:",getDateFromTimestamp(toD),endDay)
         return downwardData
     }
 

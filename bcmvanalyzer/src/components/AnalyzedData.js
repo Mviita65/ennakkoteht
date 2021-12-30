@@ -43,13 +43,13 @@ const AnalyzedData = ({newFrom,newTo}) => {
           let result = await axios(
             'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from='+start+'&to='+end
           )
-          console.log('Result: ',result)
+          // console.log('Result: ',result)
           setData(result.data.prices)
         } catch (exception) {
           console.log(exception)
         }
       } else {
-        console.log("Dates not yet given!")
+        console.log("Dates are not yet given!")
       }
     }
       
