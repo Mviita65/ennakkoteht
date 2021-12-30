@@ -2,8 +2,6 @@ import React, { useState,useEffect } from 'react'
 
 const InputData = ({newFrom,setNewFrom,newTo,setNewTo}) => {
 
-    // const [newFrom, setNewFrom] = useState("")
-    // const [newTo, setNewTo] = useState("")
     const minDate = "2013-04-28" // first date for bitcoin eur in getcoin
     const maxDate = new Date().toISOString().slice(0,10) // today yyyy-mm-dd
     const [info, setInfo] = useState("Waiting for the dates")
@@ -24,7 +22,7 @@ const InputData = ({newFrom,setNewFrom,newTo,setNewTo}) => {
         setNewTo("")
     }
 
-    const inputNewToOk = (e) => {
+    const inputNewToOk = (e) => { 
         setInfo("Dates passed!")
         setNewTo(e.target.value)
     }
