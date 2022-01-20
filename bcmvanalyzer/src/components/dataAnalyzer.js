@@ -1,6 +1,5 @@
 const dataAnalyzer = (start,end,data) => {
     let sendData = []
-    let returnValues = []
     let analyzedData = ["","","","","",""]
 
     // Coingecko API:
@@ -20,33 +19,39 @@ const dataAnalyzer = (start,end,data) => {
        return datestring
     }
 
-    const findTopCourse = (values) => { // gets the date and highest price in euros
+    const findTopCourse = (values) => {                     // gets the date and highest price in euros
+        let useValues = JSON.parse(JSON.stringify(values))  // deep copy
+        useValues.shift()                                   // removes the first value from array
         let top = 0
         let topdate = ""
-        values.forEach((item => {
+        useValues.forEach((item => {
             if (item[1] > top){
                 top = item[1]
                 topdate = getDateFromTimestamp(item[0])
             }
         }))
         let courseAndDate = String(top).concat(" €, ",topdate)
-        analyzedData[1] = courseAndDate
-        return topdate
+        // return topdate
+        return courseAndDate
     }
 
-    const findLowestCourse = (values) => { // gets the date for lowest price in euros
+    const findLowestCourse = (values) => {                  // gets the date and lowest price in euros
+        let useValues = JSON.parse(JSON.stringify(values))  // deep copy
+        useValues.shift()                                   // removes the first value from array
         let min = 1000000000
         let mindate = ""
-        values.forEach((item => {
+        useValues.forEach((item => {
             if (item[1] < min){
                 min = item[1]
                 mindate = getDateFromTimestamp(item[0])
             }
         }))
-        return mindate
+        let courseAndDate = String(min).concat(" €, ",mindate)
+        // return mindate
+        return courseAndDate
     }
 
-    const selectValues = () => {   // takes only day's first data to selectedValues and pass the others
+    const selectValues = () => {   // takes only the day's first data to selectedValues and pass the others
         let selectedValues = [data[0]]
         let day = getDateFromTimestamp(data[0][0]).slice(0, 10)
         data.forEach((item => {
@@ -56,7 +61,7 @@ const dataAnalyzer = (start,end,data) => {
             }
             day = getDateFromTimestamp(item[0]).slice(0, 10)
         }))
-        // console.log("Selected:",selectedValues)
+        console.log("Selected:",selectedValues)
         return selectedValues
     }
     
@@ -67,26 +72,30 @@ const dataAnalyzer = (start,end,data) => {
         let beginDay = ""
         let endDay = ""
         let checkValue = values[0][1]
-        let downwardData = ["Begin","End",0]
-        let fromD = (start) * 1000
+        let downwardData = [0,"Top","Begin","End","Sell","Buy"]
+        let fromD = (start + 86400) * 1000 
         let toD = end * 1000
     
         values.forEach((item => {
-            if (item[1] < checkValue){  // day's course lower than check
+            if (item[1] < checkValue){          // day's course lower than the check value
                 counter++
                 // console.log(checkValue, counter)
                 if (counter === 1){
-                    memoryDate = item[0] - 86400
+                    memoryDate = item[0]
                 }
-                if (counter > maxCount){ // new longest downward trend in days
+                if (counter > maxCount){        // new longest downward trend in days
                     maxCount = counter
                     endDay = getDateFromTimestamp(item[0])
                     beginDay = getDateFromTimestamp(memoryDate)
                     if (getDateFromTimestamp(fromD) === beginDay && 
                         getDateFromTimestamp(toD) === endDay) {
-                        analyzedData[4] = "Do not sell, trend only downwards"
-                        analyzedData[5] = "Do not buy, trend only downwards"
+                        downwardData[4] = "Do not sell, trend only downwards"
+                        downwardData[5] = "Do not buy, trend only downwards"
                     } 
+                    else {
+                        downwardData[4] = findTopCourse(values)
+                        downwardData[5] = findLowestCourse(values)
+                    }
                 }
             } else {
                 counter = 0
@@ -94,29 +103,18 @@ const dataAnalyzer = (start,end,data) => {
             checkValue = item[1]
         }))
         // console.log("Downward days:", maxCount)
-        downwardData[0] = beginDay
-        downwardData[1] = endDay
-        downwardData[2] = maxCount
+        downwardData[0] = maxCount
+        downwardData[1] = findTopCourse(values)
+        downwardData[2] = beginDay
+        downwardData[3] = endDay
+        
         // console.log("Start:",getDateFromTimestamp(fromD),beginDay,
         //    "End:",getDateFromTimestamp(toD),endDay)
         return downwardData
     }
 
-    // downwardDays = feedback[0] = analyzedData[0] etc.
-    // topCourse = feedback[1]
-    // downStart = feedback[2]
-    // downEnd = feedback[3]
-    // sellDay = feedback[4]
-    // buyDay = feedback[5]
-
     sendData = selectValues()
-
-    analyzedData[4] = findTopCourse(sendData)
-    analyzedData[5] = findLowestCourse(sendData)
-    returnValues = countDownwardDays(sendData)
-    analyzedData[2] = returnValues[0]
-    analyzedData[3] = returnValues[1]
-    analyzedData[0] = returnValues[2]
+    analyzedData = countDownwardDays(sendData)
     return analyzedData
 }
 

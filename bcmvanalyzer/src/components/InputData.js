@@ -25,11 +25,13 @@ const InputData = ({newFrom,setNewFrom,newTo,setNewTo}) => {
     const inputNewToOk = (e) => { 
         setInfo("Dates passed!")
         setNewTo(e.target.value)
+        e.stopPropagation();
     }
 
     const inputNewFromOk = (e) => {
         setInfo("Dates passed!")
         setNewFrom(e.target.value)
+        e.stopPropagation();
     }
 
     useEffect(datesPassed, [info,newFrom,newTo])
