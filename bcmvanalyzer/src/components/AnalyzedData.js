@@ -3,6 +3,18 @@ import { toTimestamp } from './helpers'
 import dataAnalyzer from './dataAnalyzer';
 import axios from 'axios';
 
+// Coingecko API:
+    // Data granularity is automatic (cannot be adjusted)
+    // 1 day from query time = 5 minute interval data
+    // 1 - 90 days from query time = hourly data
+    // above 90 days from query time = daily data (00:00 UTC)
+    // 1 Hour = 3600 Seconds
+    // 1 Day = 86400 Seconds
+    // 1 Week =	604800 Seconds
+    // 1 Month (30.44 days) =	2629743 Seconds
+    // 1 Year (365.24 days) =	31556926 Seconds
+
+// Shows the analyzed data between given dates
 const AnalyzedData = ({newFrom,newTo}) => {
   const [data,setData] = useState(["Waiting for the data..."])
   
@@ -20,8 +32,8 @@ const AnalyzedData = ({newFrom,newTo}) => {
   if (newFrom !== "" && newTo !=="") {  // dates are given in right order
 
     // today = Date.parse(new Date())/1000
-    start = toTimestamp(newFrom,'start')-86400
-    end = toTimestamp(newTo,'end')
+    start = toTimestamp(newFrom,'start')-86400 // takes also the value from the date one day earlier than begin date
+    end = toTimestamp(newTo,'end')+3600        // from the given hints added one hour
 
     if (data[0] !== "Waiting for the data..."){ // data is ready for analyzing
 
@@ -36,14 +48,14 @@ const AnalyzedData = ({newFrom,newTo}) => {
     }
   } 
    
-  useEffect(()=>{   // if dates changes, new data will be fetched
-    async function fetchData(){
+  useEffect(()=>{   
+    async function fetchData(){ // if there are change in dates, new data will be fetched
       if (start !== "" && end !== ""){
         try {
           let result = await axios(
             'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from='+start+'&to='+end
           )
-          console.log('Result: ',result)
+          // console.log('Result: ',result)
           setData(result.data.prices)
         } catch (exception) {
           console.log(exception)
@@ -59,7 +71,7 @@ const AnalyzedData = ({newFrom,newTo}) => {
 
     return (
         (newFrom !== "") && (newTo !== "")
-        ? // if there are dates given
+        ? // if the dates are given
         <form>
           ANALYZED DATA<br/>
           {/*Between {newFrom} and {newTo}<br/>*/}

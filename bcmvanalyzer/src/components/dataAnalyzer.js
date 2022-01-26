@@ -1,24 +1,15 @@
+// Returns the data needed to show results in AnalyzedData
 const dataAnalyzer = (start,end,data) => {
     let sendData = []
     let analyzedData = ["","","","","",""]
 
-    // Coingecko API:
-    // Data granularity is automatic (cannot be adjusted)
-    // 1 day from query time = 5 minute interval data
-    // 1 - 90 days from query time = hourly data
-    // above 90 days from query time = daily data (00:00 UTC)
-    // https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from=1279407600&to=1609376400
-    // 1 Hour = 3600 Seconds
-    // 1 Day = 86400 Seconds
-    // 1 Week =	604800 Seconds
-    // 1 Month (30.44 days) =	2629743 Seconds
-    // 1 Year (365.24 days) =	31556926 Seconds
-
+    // Changes the timestamp to local date string
     const getDateFromTimestamp = (stamp) => {
        let datestring = new Date(stamp).toLocaleDateString("fi-FI")
        return datestring
     }
 
+    // Finds the maximum course and it's date
     const findTopCourse = (values) => {                     // gets the date and highest price in euros
         let useValues = JSON.parse(JSON.stringify(values))  // deep copy
         useValues.shift()                                   // removes the first value from array
@@ -30,11 +21,12 @@ const dataAnalyzer = (start,end,data) => {
                 topdate = getDateFromTimestamp(item[0])
             }
         }))
-        let courseAndDate = String(top).concat(" €, ",topdate)
+        let topCourseAndDate = String(top).concat(" €, ",topdate)
         // return topdate
-        return courseAndDate
+        return topCourseAndDate
     }
 
+    // Finds the minimum course and it's date
     const findLowestCourse = (values) => {                  // gets the date and lowest price in euros
         let useValues = JSON.parse(JSON.stringify(values))  // deep copy
         useValues.shift()                                   // removes the first value from array
@@ -46,61 +38,64 @@ const dataAnalyzer = (start,end,data) => {
                 mindate = getDateFromTimestamp(item[0])
             }
         }))
-        let courseAndDate = String(min).concat(" €, ",mindate)
+        let minCourseAndDate = String(min).concat(" €, ",mindate)
         // return mindate
-        return courseAndDate
+        return minCourseAndDate
     }
 
-    const selectValues = () => {   // takes only the day's first data to selectedValues and pass the others
-        let selectedValues = [data[0]]
-        let day = getDateFromTimestamp(data[0][0]).slice(0, 10)
+    // Selects the day's first value for each date
+    const selectValues = () => {   
+        let selectedValues = [data[0]]                                  // start value is the first item
+        let day = getDateFromTimestamp(data[0][0]).slice(0, 10)         // first item's date without time
         data.forEach((item => {
-            let itemDay = getDateFromTimestamp(item[0]).slice(0, 10)
-            if (itemDay !== day){
+            let itemDay = getDateFromTimestamp(item[0]).slice(0, 10)    // item's date without time
+            if (itemDay !== day){                                       // if date changes then push new item to selectedValues
                selectedValues.push(item)
             }
-            day = getDateFromTimestamp(item[0]).slice(0, 10)
+            day = getDateFromTimestamp(item[0]).slice(0, 10)            // update the day
         }))
-        console.log("Selected:",selectedValues)
+        // console.log("Selected:",selectedValues)
         return selectedValues
     }
     
-    const countDownwardDays = (values) => { // there is bug in this one: the warning does not work correctly
+    // Finds the longest downward trend and collects the other needed values
+    // CoinGeckos API changes the granularity and it's causing the troubles (the day's value is not stabile)
+    const countDownwardDays = (values) => { 
         let counter = 0
         let maxCount = 0
         let memoryDate = values[0][0]
         let beginDay = ""
         let endDay = ""
         let checkValue = values[0][1]
-        let downwardData = [0,"Top","Begin","End","Sell","Buy"]
+        let downwardData = [0,"Top","Begin","End","",""]
         let fromD = (start + 86400) * 1000 
         let toD = end * 1000
     
         values.forEach((item => {
-            if (item[1] < checkValue){          // day's course lower than the check value
-                counter++
+            if (item[1] < checkValue){          // day's course is lower than the checkValue
+                counter++                       // so add the counter (downward trend)
                 // console.log(checkValue, counter)
                 if (counter === 1){
-                    memoryDate = item[0]
+                    memoryDate = item[0]        // perhaps there is a new longer trend to begin from this date
                 }
-                if (counter > maxCount){        // new longest downward trend in days
-                    maxCount = counter
-                    endDay = getDateFromTimestamp(item[0])
-                    beginDay = getDateFromTimestamp(memoryDate)
+                if (counter > maxCount){        // new longest downward trend in days 
+                    maxCount = counter          // so change the maxCount to this longer trend
+                    endDay = getDateFromTimestamp(item[0])  // gets the endDay for downward trend
+                    beginDay = getDateFromTimestamp(memoryDate) // gets the beginDay for downward trend
                     if (getDateFromTimestamp(fromD) === beginDay && 
                         getDateFromTimestamp(toD) === endDay) {
-                        downwardData[4] = "Do not sell, trend only downwards"
-                        downwardData[5] = "Do not buy, trend only downwards"
+                        downwardData[4] = "Do not sell, trend only downwards"   // if the course is only downward
+                        downwardData[5] = "Do not buy, trend only downwards"    // between given dates
                     } 
-                    else {
-                        downwardData[4] = findTopCourse(values)
-                        downwardData[5] = findLowestCourse(values)
+                    else {                                          // otherwise
+                        downwardData[4] = findTopCourse(values)     // best date for selling
+                        downwardData[5] = findLowestCourse(values)  // best date for buying
                     }
                 }
-            } else {
+            } else {                            // downward trend has ended   
                 counter = 0
             }
-            checkValue = item[1]
+            checkValue = item[1]                // update the checkValue
         }))
         // console.log("Downward days:", maxCount)
         downwardData[0] = maxCount
